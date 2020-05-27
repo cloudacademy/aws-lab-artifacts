@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS lab_records;
-CREATE DATABASE IF NOT EXISTS lab_records;
-USE lab_records;
+DROP DATABASE IF EXISTS lab_database;
+CREATE DATABASE IF NOT EXISTS lab_database;
+USE lab_database;
 
 SELECT 'CREATING DATABASE STRUCTURE' as 'INFO';
 
