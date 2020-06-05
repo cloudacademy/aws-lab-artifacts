@@ -1,3 +1,4 @@
+'''Sample web app to test a database connection'''
 from flask import Flask
 from flaskext.mysql import MySQL
 from flask import jsonify
@@ -13,10 +14,17 @@ mysql.init_app(app)
 @app.route('/')
 def db_connect():
     try:
-      conn = mysql.connect()
-      return jsonify(db_status="CONNECTED", password=app.config['MYSQL_DATABASE_PASSWORD'])
-    except Exception as e:
-      return jsonify(db_status="DISCONNECTED", config=app.config['MYSQL_DATABASE_PASSWORD'], error_message=str(e))
+        conn = mysql.connect()
+        return jsonify(
+            db_status="CONNECTED",
+            password=app.config['MYSQL_DATABASE_PASSWORD']
+        )
+    except Exception as error:
+        return jsonify(
+            db_status="DISCONNECTED",
+            config=app.config['MYSQL_DATABASE_PASSWORD'],
+            error_message=str(error)
+        )
 
 if __name__ == '__main__':
     # Make the server publicly available by default
