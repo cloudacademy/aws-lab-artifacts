@@ -3,12 +3,18 @@ from flask import Flask
 from flaskext.mysql import MySQL
 from flask import jsonify
 
+credentials = {
+  username:'username',
+  password:'password',
+  host:'rds-endpoint'
+}
+
 app = Flask(__name__)
 mysql = MySQL()
-app.config['MYSQL_DATABASE_USER'] = 'username'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'password'
+app.config['MYSQL_DATABASE_USER'] = credentials['username']
+app.config['MYSQL_DATABASE_PASSWORD'] = credentials['password']
+app.config['MYSQL_DATABASE_HOST'] = credentials['host']
 app.config['MYSQL_DATABASE_DB'] = 'information_schema'
-app.config['MYSQL_DATABASE_HOST'] = 'db-endpoint'
 mysql.init_app(app)
 
 
