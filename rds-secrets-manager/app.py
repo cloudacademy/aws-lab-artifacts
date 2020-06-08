@@ -3,11 +3,9 @@ from flask import Flask
 from flaskext.mysql import MySQL
 from flask import jsonify
 
-credentials = {
-  username:'username',
-  password:'password',
-  host:'rds-endpoint'
-}
+credentials = dict(username='username',
+                   password='password',
+                   host='rds-endpoint')
 
 app = Flask(__name__)
 mysql = MySQL()
