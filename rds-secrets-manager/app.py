@@ -3,22 +3,28 @@ from flask import Flask
 from flaskext.mysql import MySQL
 from flask import jsonify
 
-credentials = dict(username='username',
-                   password='password',
-                   host='rds-endpoint')
+
+def hardcoded_credentials():
+    return dict(username='username', password='password', host='rds-endpoint')
+
+
+def configure_app(credentials):
+    app.config['MYSQL_DATABASE_USER'] = credentials['username']
+    app.config['MYSQL_DATABASE_PASSWORD'] = credentials['password']
+    app.config['MYSQL_DATABASE_HOST'] = credentials['host']
+    app.config['MYSQL_DATABASE_DB'] = 'information_schema'
+
 
 app = Flask(__name__)
 mysql = MySQL()
-app.config['MYSQL_DATABASE_USER'] = credentials['username']
-app.config['MYSQL_DATABASE_PASSWORD'] = credentials['password']
-app.config['MYSQL_DATABASE_HOST'] = credentials['host']
-app.config['MYSQL_DATABASE_DB'] = 'information_schema'
 mysql.init_app(app)
 
 
 @app.route('/')
 def db_connect():
+    credentials = hardcoded_credentials()
     try:
+        configure_app(credentials)
         conn = mysql.connect()
         return jsonify(db_status="CONNECTED", credentials=credentials)
     except Exception as error:
