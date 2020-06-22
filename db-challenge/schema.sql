@@ -36,20 +36,20 @@ CREATE TABLE table_three (
 );
 
 
-INSERT INTO `table_one` VALUES (10001,'Yaiqu2chohWea9','Yaiqu2chohWea9',CURRENT_TIMESTAMP(),
-(10002,'Yaiqu2chohWea9','Yaiqu2chohWea9',CURRENT_TIMESTAMP(),
-(10003,'Yaiqu2chohWea9','Yaiqu2chohWea9',CURRENT_TIMESTAMP(),
-(10004,'Yaiqu2chohWea9','Yaiqu2chohWea9',CURRENT_TIMESTAMP(),
+INSERT INTO `table_one` VALUES (10001,'Yaiqu2chohWea9','Yaiqu2chohWea9',CURRENT_TIMESTAMP()),
+(10002,'Yaiqu2chohWea9','Yaiqu2chohWea9',CURRENT_TIMESTAMP()),
+(10003,'Yaiqu2chohWea9','Yaiqu2chohWea9',CURRENT_TIMESTAMP()),
+(10004,'Yaiqu2chohWea9','Yaiqu2chohWea9',CURRENT_TIMESTAMP()),
 (10005,'Yaiqu2chohWea9','Yaiqu2chohWea9',CURRENT_TIMESTAMP());
 
-INSERT INTO `table_two` VALUES (10001,'Ohqueingau3ohn','Ohqueingau3ohn',CURRENT_TIMESTAMP(),
-(10002,'Ohqueingau3ohn','Ohqueingau3ohn',CURRENT_TIMESTAMP(),
-(10003,'Ohqueingau3ohn','Ohqueingau3ohn',CURRENT_TIMESTAMP(),
-(10004,'Ohqueingau3ohn','Ohqueingau3ohn',CURRENT_TIMESTAMP(),
+INSERT INTO `table_two` VALUES (10001,'Ohqueingau3ohn','Ohqueingau3ohn',CURRENT_TIMESTAMP()),
+(10002,'Ohqueingau3ohn','Ohqueingau3ohn',CURRENT_TIMESTAMP()),
+(10003,'Ohqueingau3ohn','Ohqueingau3ohn',CURRENT_TIMESTAMP()),
+(10004,'Ohqueingau3ohn','Ohqueingau3ohn',CURRENT_TIMESTAMP()),
 (10005,'Ohqueingau3ohn','Ohqueingau3ohn',CURRENT_TIMESTAMP());
 
-INSERT INTO `table_one` VALUES (10001,'ahnei9cheinooT','ahnei9cheinooT',CURRENT_TIMESTAMP(),
-(10002,'ahnei9cheinooT','ahnei9cheinooT',CURRENT_TIMESTAMP(),
-(10003,'ahnei9cheinooT','ahnei9cheinooT',CURRENT_TIMESTAMP(),
-(10004,'ahnei9cheinooT','ahnei9cheinooT',CURRENT_TIMESTAMP(),
+INSERT INTO `table_three` VALUES (10001,'ahnei9cheinooT','ahnei9cheinooT',CURRENT_TIMESTAMP()),
+(10002,'ahnei9cheinooT','ahnei9cheinooT',CURRENT_TIMESTAMP()),
+(10003,'ahnei9cheinooT','ahnei9cheinooT',CURRENT_TIMESTAMP()),
+(10004,'ahnei9cheinooT','ahnei9cheinooT',CURRENT_TIMESTAMP()),
 (10005,'ahnei9cheinooT','ahnei9cheinooT',CURRENT_TIMESTAMP());
