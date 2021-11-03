@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: red-pod
+  name: red-pod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: red-pod
+  template:
+    metadata:
+      labels:
+        app: red-pod
+    spec:
+      affinity:
+       nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: "vpc.amazonaws.com/has-trunk-attached"
+              operator: In
+              values:
+                - "true"
+      containers:
+      - image: 421805900968.dkr.ecr.us-east-2.amazonaws.com/cloudacademy/labs-workspace/eks-lab-app:8444b90
+        name: red-pod
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
+          limits:
+            memory: "512Mi"
+            cpu: "1024m"
+        env:
+        - name: HOST
+          valueFrom:
+            secretKeyRef:
+              name: rds
+              key: host
+        - name: DBNAME
+          value: ekslab
+        - name: USER
+          value: ekslab
+        - name: PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: rds
+              key: password
