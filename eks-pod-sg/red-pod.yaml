@@ -24,7 +24,7 @@ spec:
               values:
                 - "true"
       containers:
-      - image: 421805900968.dkr.ecr.us-east-2.amazonaws.com/cloudacademy/labs-workspace/eks-lab-app:8444b90
+      - image: public.ecr.aws/cloudacademy-labs/cloudacademy/labs/eks-lab-app:8444b90
         name: red-pod
         resources:
           requests:
