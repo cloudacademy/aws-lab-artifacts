@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Using old version from https://github.com/nodesource/distributions/blob/1869c656b296445e87d8afa6cb2fcfdf663d6bba/rpm/setup_10.x
+# Sleeps disabled for better performance
+
 # Discussion, issues and change requests at:
 #   https://github.com/nodesource/distributions
 #
@@ -94,11 +97,8 @@ node_deprecation_warning() {
           "X${NODENAME}" == "XNode.js 9.x" ||
           "X${NODENAME}" == "XNode.js 10.x" ||
           "X${NODENAME}" == "XNode.js 11.x" ||
-          "X${NODENAME}" == "XNode.js 12.x" ||
           "X${NODENAME}" == "XNode.js 13.x" ||
-          "X${NODENAME}" == "XNode.js 14.x" ||
-          "X${NODENAME}" == "XNode.js 15.x" ||
-          "X${NODENAME}" == "XNode.js 17.x" ]]; then
+          "X${NODENAME}" == "XNode.js 15.x" ]]; then
 
         print_bold \
 "                            DEPRECATION WARNING                            " "\
@@ -110,10 +110,10 @@ ${bold}${NODENAME} is no longer actively supported!${normal}
   Use the installation script that corresponds to the version of Node.js you
   wish to install. e.g.
 
+   * ${green}https://rpm.nodesource.com/setup_12.x - Node.js v12 LTS \"Erbium\"${normal}
+   * ${green}https://rpm.nodesource.com/setup_14.x - Node.js v14 LTS \"Fermium\"${normal} (recommended)
    * ${green}https://rpm.nodesource.com/setup_16.x - Node.js v16 \"Gallium\"${normal}
-   * ${green}https://rpm.nodesource.com/setup_18.x - Node.js v18 LTS \"Hydrogen\"${normal} (recommended)
-   * ${green}https://rpm.nodesource.com/setup_19.x — Node.js v19 \"Nineteen\"${normal}
-   * ${green}https://rpm.nodesource.com/setup_20.x — Node.js v20 \"Iron\"${normal} (current)
+   * ${green}https://rpm.nodesource.com/setup_17.x - Node.js v17 \"Seventeen\"${normal} (current)
 
   Please see ${bold}https://github.com/nodejs/Release${normal} for details about which
   version may be appropriate for you.
@@ -126,7 +126,7 @@ ${bold}${NODENAME} is no longer actively supported!${normal}
         echo
         echo "Continuing in 20 seconds ..."
         echo
-        sleep 20
+        sleep 0
     fi
 }
 
@@ -140,10 +140,10 @@ This script, located at ${bold}https://rpm.nodesource.com/setup${normal}, used t
   You should use the script that corresponds to the version of Node.js you
   wish to install. e.g.
 
+   * ${green}https://rpm.nodesource.com/setup_12.x - Node.js v12 LTS \"Erbium\"${normal}
+   * ${green}https://rpm.nodesource.com/setup_14.x - Node.js v14 LTS \"Fermium\"${normal} (recommended)
    * ${green}https://rpm.nodesource.com/setup_16.x - Node.js v16 \"Gallium\"${normal}
-   * ${green}https://rpm.nodesource.com/setup_18.x - Node.js v18 LTS \"Hydrogen\"${normal} (recommended)
-   * ${green}https://rpm.nodesource.com/setup_19.x — Node.js v19 \"Nineteen\"${normal}
-   * ${green}https://rpm.nodesource.com/setup_20.x — Node.js v20 \"Iron\"${normal} (current)
+   * ${green}https://rpm.nodesource.com/setup_17.x - Node.js v17 \"Seventeen\"${normal} (current)
 
   Please see ${bold}https://github.com/nodejs/Release${normal} for details about which
   version may be appropriate for you.
@@ -157,61 +157,14 @@ This script, located at ${bold}https://rpm.nodesource.com/setup${normal}, used t
         echo
         echo "Continuing in 20 seconds (press Ctrl-C to abort) ..."
         echo
-        sleep 20
+        sleep 0
     fi
-}
-
-print_bold_deprecation() {
-    title="$1"
-    text="$2"
-
-    echo
-    echo "${bold}${red}================================================================================${normal}"
-    echo "${bold}${red}▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓${normal}"
-    echo "${bold}${red}================================================================================${normal}"
-    echo
-    echo -e "  ${bold}${yellow}${title}${normal}"
-    echo
-    echo -en "  ${text}"
-    echo
-    echo "${bold}${red}================================================================================${normal}"
-    echo "${bold}${red}▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓${normal}"
-    echo "${bold}${red}================================================================================${normal}"
-}
-
-
-repo_deprecation_warning() {
-  print_bold_deprecation \
-"                         ${underline}SCRIPT DEPRECATION WARNING${normal}                    " "\
-
-  This script, located at ${bold}https://rpm.nodesource.com/setup_X${normal}, used to
-  install Node.js is deprecated now and will eventually be made inactive.
-
-  Please visit the NodeSource ${bold}distributions${normal} Github and follow the
-  instructions to migrate your repo.
-  ${underline}${green}${bold}https://github.com/nodesource/distributions${normal}
-
-  The ${bold}NodeSource${normal} Node.js Linux distributions GitHub repository contains
-  information about which versions of Node.js and which Linux distributions
-  are supported and how to install it.
-  ${underline}${green}${bold}https://github.com/nodesource/distributions${normal}
-
-
-                          ${underline}${bold}${yellow}SCRIPT DEPRECATION WARNING${normal}
-"
-
-        echo
-        echo "${cyan}${bold}TO AVOID THIS WAIT MIGRATE THE SCRIPT${normal}"
-        echo "Continuing in 60 seconds (press Ctrl-C to abort) ..."
-        echo
-        sleep 60
 }
 
 setup() {
 
 script_deprecation_warning
 node_deprecation_warning
-repo_deprecation_warning
 
 print_status "Installing the NodeSource ${NODENAME} repo..."
 
@@ -230,29 +183,10 @@ fi
 #-check-distro-#
 
 ## Check distro and arch
-##echo "+ rpm -q --whatprovides redhat-release || rpm -q --whatprovides centos-release || rpm -q --whatprovides cloudlinux-release || rpm -q --whatprovides sl-release || rpm -q --whatprovides fedora-release"
-##DISTRO_PKG=$(rpm -q --whatprovides redhat-release || rpm -q --whatprovides centos-release || rpm -q --whatprovides cloudlinux-release || rpm -q --whatprovides sl-release || rpm -q --whatprovides fedora-release)
+echo "+ rpm -q --whatprovides redhat-release || rpm -q --whatprovides centos-release || rpm -q --whatprovides cloudlinux-release || rpm -q --whatprovides sl-release || rpm -q --whatprovides fedora-release"
+DISTRO_PKG=$(rpm -q --whatprovides redhat-release || rpm -q --whatprovides centos-release || rpm -q --whatprovides cloudlinux-release || rpm -q --whatprovides sl-release || rpm -q --whatprovides fedora-release)
 echo "+ uname -m"
 UNAME_ARCH=$(uname -m)
-
-PKG_LIST=(
-  "redhat-release"
-  "centos-release"
-  "cloudlinux-release"
-  "sl-release"
-  "fedora-release"
-  "system-release"
-  )
-
-for PKG in "${PKG_LIST[@]}"; do
-  rpm -q --whatprovides ${PKG}
-  if [ $? -eq 0 ]; then
-    echo "exec ${PKG}" 
-    DISTRO_PKG=$(rpm -q --whatprovides ${PKG})
-    echo "Release package: ""${DISTRO_PKG}"
-    break
-  fi
-done
 
 
 if [ "X${UNAME_ARCH}" == "Xi686" ]; then
@@ -275,8 +209,6 @@ fi
 
 if [[ $DISTRO_PKG =~ ^(redhat|centos|almalinux|rocky|cloudlinux|mageia|sl)- ]]; then
     DIST_TYPE=el
-elif [[ $DISTRO_PKG =~ ^system-release-(2023) ]]; then # Amazon Linux 2023 and possibly 2025
-    DIST_TYPE=al
 elif [[ $DISTRO_PKG =~ ^(enterprise|system)-release- ]]; then # Oracle Linux & Amazon Linux
     DIST_TYPE=el
 elif [[ $DISTRO_PKG =~ ^(fedora|korora)- ]]; then
@@ -290,26 +222,23 @@ You don't appear to be running a supported version of Enterprise Linux. \
 Please contact NodeSource at \
 https://github.com/nodesource/distributions/issues if you think this is \
 incorrect or would like your architecture to be considered for support. \
-Include your 'distribution package' name in the list: ${PKG_LIST[*]}. \
+Include your 'distribution package' name: ${DISTRO_PKG}. \
 "
   exit 1
 
 fi
 
-if [[ $DISTRO_PKG =~ ^system-release-2-14 ]]; then
+if [[ $DISTRO_PKG =~ ^system-release ]]; then
 
   # Amazon Linux, for 2014.* use el7, older versions are unknown, perhaps el6
   DIST_VERSION=7
-elif [[ $DISTRO_PKG =~ ^system-release-2023 ]]; then
 
-  # Amazon Linux 2023
-  DIST_VERSION=2023
 else
 
   ## Using the redhat-release-server-X, centos-release-X, centos-stream-release-X, etc. pattern
   ## extract the major version number of the distro
   if [[ $DIST_TYPE =~ fc ]]; then 
-    DIST_VERSION=$(echo $DISTRO_PKG | sed -r 's/.*fedora([[:alpha:]]+(-stream|-linux)?)?-release(-server|-workstation|-client|-common|-container|-kde|-cloud|-xfce|-cinnamon)?-([0-9]+).*$/\4/')    
+    DIST_VERSION=$(echo $DISTRO_PKG | sed -r 's/.*fedora([[:alpha:]]+(-stream|-linux)?)?-release(-server|-workstation|-client|-common|-container|-kde|-cloud|-xfce)?-([0-9]+).*$/\4/')    
   else
     DIST_VERSION=$(echo $DISTRO_PKG | sed -r 's/^[[:alpha:]]+(-stream|-linux)?-release(-server|-workstation|-client|-common|-container|-Default)?-([0-9]+).*$/\3/')
   fi
