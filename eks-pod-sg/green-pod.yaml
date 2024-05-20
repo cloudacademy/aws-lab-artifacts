@@ -19,10 +19,10 @@ spec:
         requiredDuringSchedulingIgnoredDuringExecution:
           nodeSelectorTerms:
           - matchExpressions:
-            - key: "vpc.amazonaws.com/has-trunk-attached"
+            - key: "alpha.eksctl.io/cluster-name"
               operator: In
               values:
-                - "true"
+                - "Cluster-1"
       containers:
       - image: public.ecr.aws/cloudacademy-labs/cloudacademy/labs/eks-lab-app:8444b90
         name: green-pod
