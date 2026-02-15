@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Cost Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+  <style>
+    body {
+      padding: 1rem;
+    }
+
+    .cost-row {
+      border: 1px solid #ddd;
+      border-radius: .5rem;
+      padding: .5rem;
+      margin-bottom: 1rem;
+    }
+
+    .cost-title {
+      font-weight: 600;
+    }
+
+    .chart-canvas {
+      max-height: 150px;
+    }
+
+    @media (min-width:768px) {
+      .cost-row .col {
+        flex: 1 1 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="row mb-3">
+    <div class="col-12 col-md-6">
+      <div class="d-flex gap-2">
+        <input id="urlInput" type="url" class="form-control" placeholder="Enter JSON URL">
+        <button id="startBtn" class="btn btn-primary">Start</button>
+        <button id="clearBtn" class="btn btn-outline-danger" style="display: none;">Clear Data</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="dashboard"></div>
+
+  <script>
+    /* ---------- Configuration ---------- */
+    const SHOW_CLEAR_BUTTON = false; // Set to false to hide the clear button
+    const CACHE_EXPIRY_HOURS = 1; // Cache expiry time in hours
+
+    /* ---------- create a row + charts ---------- */
+    function createCostRow(id, title) {
+      const row = document.createElement('div');
+      row.className = 'cost-row';
+      row.dataset.id = id;
+      row.innerHTML = `
+    <div class="row align-items-center">
+      <div class="col-12 col-md-5">
+        <div class="mb-2 text-center"><strong>Historical Cost</strong></div>
+        <canvas class="chart-canvas estimate-${id}"></canvas>
+      </div>
+      <div class="col-12 col-md-2 text-center"><span class="current-cost">?</span> USD/day</div>
+      <div class="col-12 col-md-5">
+        <div class="mb-2 text-center cost-title"><strong>${title}</strong></div>
+        <canvas class="chart-canvas forecast-${id}"></canvas>
+      </div>
+    </div>
+  `;
+      document.getElementById('dashboard').appendChild(row);
+
+      const estCtx = row.querySelector(`.estimate-${id}`).getContext('2d');
+      const foreCtx = row.querySelector(`.forecast-${id}`).getContext('2d');
+
+      const baseOpts = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { y: { beginAtZero: true, max: 0.5 } },   /* <-- max $0.5 */
+        interaction: {
+          intersect: false,
+          mode: 'none'
+        },
+        plugins: {
+          legend: {
+            onHover: () => { },
+            onClick: () => { }
+          },
+          tooltip: {
+            enabled: false
+          }
+        },
+        onHover: () => { },
+        onClick: () => { }
+      };
+
+      const estimateChart = new Chart(estCtx, {
+        type: 'line',
+        data: { labels: [], datasets: [{ label: 'Cost (last 3 days) - $0.00/day', data: [], borderColor: 'blue', fill: false }] },
+        options: baseOpts
+      });
+
+      const forecastChart = new Chart(foreCtx, {
+        type: 'line',
+        data: { labels: [], datasets: [{ label: 'Forecast (next 3 days) - $0.00/day', data: [], borderColor: 'green', borderDash: [5, 5], fill: false }] },
+        options: baseOpts
+      });
+
+      return { row, estimateChart, forecastChart };
+    }
+
+    /* ---------- state ---------- */
+    const costSets = {
+      ec2: createCostRow('ec2', 'EC2: 1 instance'),
+      asg: createCostRow('asg', 'ASG: 1 instance 24/7'),
+      ecr: createCostRow('ecr', 'ECR: 1 repo with 100 images')
+    };
+
+    // Load stored estimate data from localStorage with expiration check
+    function loadStoredEstimates() {
+      const stored = localStorage.getItem('costEstimates');
+      if (stored) {
+        try {
+          const data = JSON.parse(stored);
+
+          // Check if data has expiration timestamp
+          if (data.timestamp) {
+            const now = Date.now();
+            const expiryTime = data.timestamp + (CACHE_EXPIRY_HOURS * 60 * 60 * 1000);
+
+            if (now > expiryTime) {
+              console.log('Cache expired, clearing stored estimates');
+              localStorage.removeItem('costEstimates');
+              return { ec2: null, asg: null, ecr: null };
+            }
+
+            // Return the estimates data (without timestamp)
+            const { timestamp, ...estimates } = data;
+            return estimates;
+          } else {
+            // Old format without timestamp, consider it expired
+            localStorage.removeItem('costEstimates');
+            return { ec2: null, asg: null, ecr: null };
+          }
+        } catch (e) {
+          console.error('Error parsing stored estimates:', e);
+          localStorage.removeItem('costEstimates');
+        }
+      }
+      return { ec2: null, asg: null, ecr: null };
+    }
+
+    // Save estimate data to localStorage with timestamp
+    function saveEstimates(estimates) {
+      const dataWithTimestamp = {
+        timestamp: Date.now(),
+        ...estimates
+      };
+      localStorage.setItem('costEstimates', JSON.stringify(dataWithTimestamp));
+    }
+
+    const firstEstimate = loadStoredEstimates();
+
+    /* ---------- Clear button functionality ---------- */
+    function clearStoredData() {
+      if (confirm('Are you sure you want to clear all stored estimate data?')) {
+        localStorage.removeItem('costEstimates');
+        location.reload(); // Refresh the page to reset the charts
+      }
+    }
+
+    // Show/hide clear button based on configuration
+    document.addEventListener('DOMContentLoaded', () => {
+      const clearBtn = document.getElementById('clearBtn');
+      if (SHOW_CLEAR_BUTTON) {
+        clearBtn.style.display = 'block';
+        clearBtn.addEventListener('click', clearStoredData);
+      }
+    });
+
+    /* ---------- polling ---------- */
+    let pollTimer = null;
+
+    function startPolling() {
+      const url = document.getElementById('urlInput').value.trim();
+      if (!url) return;
+
+      // Hide the URL input and start button after starting
+      document.getElementById('urlInput').style.display = 'none';
+      document.getElementById('startBtn').style.display = 'none';
+
+      clearInterval(pollTimer);
+      fetchAndUpdate(url);               // immediate fetch
+      pollTimer = setInterval(() => fetchAndUpdate(url), 10_000);
+    }
+
+    /* start on button click */
+    document.getElementById('startBtn').addEventListener('click', startPolling);
+
+    /* also start when Enter is pressed in the input */
+    document.getElementById('urlInput')
+      .addEventListener('keydown', e => { if (e.key === 'Enter') startPolling(); });
+
+    async function fetchAndUpdate(url) {
+      try {
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+
+        // Extract titles, base and current daily costs
+        const ec2Title = data.EC2?.title || 'EC2';
+        const ec2BaseCost = Number(data.EC2?.base_daily_cost) || 0;
+        const ec2CurrentCost = Number(data.EC2?.current_daily_cost) || 0;
+
+        const asgTitle = data.ASG?.title || 'ASG';
+        const asgBaseCost = Number(data.ASG?.base_daily_cost) || 0;
+        const asgCurrentCost = Number(data.ASG?.current_daily_cost) || 0;
+
+        const ecrTitle = data.ECR?.title || 'ECR';
+        const ecrBaseCost = Number(data.ECR?.base_daily_cost) || 0;
+        const ecrCurrentCost = Number(data.ECR?.current_daily_cost) || 0;
+
+        updateCostSet('ec2', ec2BaseCost, ec2CurrentCost, ec2Title);
+        updateCostSet('asg', asgBaseCost, asgCurrentCost, asgTitle);
+        updateCostSet('ecr', ecrBaseCost, ecrCurrentCost, ecrTitle);
+      } catch (err) {
+        console.error('Fetch error:', err);
+      }
+    }
+
+    /* ---------- UI & chart updates ---------- */
+    function updateCostSet(key, baseCost, currentCost, title) {
+      const set = costSets[key];
+      set.row.querySelector('.current-cost').textContent = currentCost.toFixed(2);
+
+      // Update the forecast title if provided (always use current title for forecast)
+      if (title) {
+        const titleElement = set.row.querySelector('.cost-title');
+        titleElement.innerHTML = `<strong>${title}</strong>`;
+      }
+
+      /* Estimate (last 3 days) - load from storage or create once with base cost */
+      if (!firstEstimate[key]) {
+        const labels = getPastDays(3);
+        const values = labels.map(() => baseCost);
+        set.estimateChart.data.labels = labels;
+        set.estimateChart.data.datasets[0].data = values;
+        set.estimateChart.data.datasets[0].label = `Cost (last 3 days) - $${baseCost.toFixed(2)}/day`;
+        set.estimateChart.update();
+        firstEstimate[key] = { labels, values, cost: baseCost, title: title };
+        saveEstimates(firstEstimate);
+      } else {
+        // Restore from stored data
+        set.estimateChart.data.labels = firstEstimate[key].labels;
+        set.estimateChart.data.datasets[0].data = firstEstimate[key].values;
+        set.estimateChart.data.datasets[0].label = `Cost (last 3 days) - $${firstEstimate[key].cost.toFixed(2)}/day`;
+        set.estimateChart.update();
+
+        // For forecast title, always use current title (not cached)
+        if (title) {
+          const titleElement = set.row.querySelector('.cost-title');
+          titleElement.innerHTML = `<strong>${title}</strong>`;
+        }
+      }
+
+      /* Forecast (next 3 days) - always recalculate with current cost and use current title */
+      const fLabels = getFutureDays(3);
+      const fValues = fLabels.map(() => currentCost);
+      set.forecastChart.data.labels = fLabels;
+      set.forecastChart.data.datasets[0].data = fValues;
+      set.forecastChart.data.datasets[0].label = `Forecast (next 3 days) - $${currentCost.toFixed(2)}/day`;
+      set.forecastChart.update();
+    }
+
+    /* ---------- helpers ---------- */
+    function getPastDays(n) {
+      const today = new Date();
+      return Array.from({ length: n }, (_, i) => {
+        const d = new Date(today);
+        d.setDate(today.getDate() - (n - 1 - i));
+        return i === n - 1 ? 'Today' : `${d.getMonth() + 1}/${d.getDate()}`;
+      });
+    }
+    function getFutureDays(n) {
+      const today = new Date();
+      return Array.from({ length: n }, (_, i) => {
+        const d = new Date(today);
+        d.setDate(today.getDate() + i + 1);
+        return i === 0 ? 'Tomorrow' : `${d.getMonth() + 1}/${d.getDate()}`;
+      });
+    }
+  </script>
+</body>
+
+</html>
